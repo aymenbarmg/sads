@@ -151,6 +151,19 @@ font-size:12px;
 <div id="result"></div>
 
 <script>
+    function formatTime12h(time24){
+let [h, m] = time24.split(":");
+h = parseInt(h);
+
+if(isNaN(h)) return "";
+
+let period = h >= 12 ? "مساءً" : "صباحاً";
+
+h = h % 12;
+if(h === 0) h = 12;
+
+return `${h}:${m} ${period}`;
+}
 function generateRoutine(){
 
 const days = [
@@ -456,7 +469,7 @@ if(item.type.includes("محاضرة")){
 
 html += `
 <li class="lecture">
-${item.start} - ${item.end}
+${formatTime12h(item.start)} - ${formatTime12h(item.end)}
 ${item.type}
 ${item.subject}
 </li>
@@ -468,7 +481,9 @@ if(item.type.includes("إلكتروني")){
 
 html += `
 <li class="online">
-${item.start} - ${item.end}
+${formatTime12h(item.start)} - ${formatTime12h(item.end)}
+${item.type}
+${item.subject}
 ${item.type}
 ${item.subject}
 </li>
@@ -480,7 +495,9 @@ if(item.type.includes("حضوري")){
 
 html += `
 <li class="exam">
-${item.start} - ${item.end}
+${formatTime12h(item.start)} - ${formatTime12h(item.end)}
+${item.type}
+${item.subject}
 ${item.type}
 ${item.subject}
 </li>
