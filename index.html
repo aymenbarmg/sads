@@ -61,9 +61,29 @@ margin:5px;
 .addOnline{background:#ff9800;color:white;}
 .addExam{background:#f44336;color:white;}
 
-.generate{width:100%;background:#1565c0;color:white;font-size:18px;padding:15px;}
-.saveBtn{width:100%;background:#2e7d32;color:white;font-size:16px;padding:12px;}
-.clearBtn{width:100%;background:#c62828;color:white;font-size:16px;padding:12px;}
+.generate{
+width:100%;
+background:#1565c0;
+color:white;
+font-size:18px;
+padding:15px;
+}
+
+.saveBtn{
+width:100%;
+background:#2e7d32;
+color:white;
+font-size:16px;
+padding:12px;
+}
+
+.clearBtn{
+width:100%;
+background:#c62828;
+color:white;
+font-size:16px;
+padding:12px;
+}
 
 .event{
 background:#eef5ff;
@@ -81,12 +101,30 @@ border-radius:15px;
 box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
-.dayTitle{color:#1565c0;margin-bottom:10px;}
+.dayTitle{
+color:#1565c0;
+margin-bottom:10px;
+}
 
-.study{color:#4caf50;font-weight:bold;}
-.exam{color:red;font-weight:bold;}
-.online{color:#ff9800;font-weight:bold;}
-.lecture{color:#1565c0;font-weight:bold;}
+.study{
+color:#4caf50;
+font-weight:bold;
+}
+
+.exam{
+color:red;
+font-weight:bold;
+}
+
+.online{
+color:#ff9800;
+font-weight:bold;
+}
+
+.lecture{
+color:#1565c0;
+font-weight:bold;
+}
 
 .deleteBtn{
 background:#d32f2f;
@@ -105,23 +143,80 @@ font-size:12px;
 
 <button class="saveBtn" onclick="saveData()">💾 حفظ البيانات</button>
 <button class="generate" onclick="generateSchedule()">إنشاء الجدول الذكي</button>
+<button class="generate" onclick="generateRoutine()">
+📅 إنشاء روتين يومي
+</button>
 <button class="clearBtn" onclick="clearAll()">🗑 حذف كل شيء</button>
 
 <div id="result"></div>
 
 <script>
+function generateRoutine(){
 
-const subjects = ["العربي","الإنكليزي","الرياضيات","الفيزياء","الكيمياء","الأحياء","الإسلامية"];
+const days = [
+"السبت","الأحد","الإثنين",
+"الثلاثاء","الأربعاء",
+"الخميس","الجمعة"
+];
 
-const subjectsContainer = document.getElementById("subjects");
+let html = "<h2>📅 الروتين اليومي</h2>";
 
-/* إنشاء الواجهة */
+days.forEach(day=>{
+
+let count =
+document.querySelectorAll(
+`.event .day`
+);
+
+html += `
+<div class="dayCard">
+<h2 class="dayTitle">${day}</h2>
+
+<ul>
+<li>🌅 الاستيقاظ: 6:00 صباحاً</li>
+<li>🍳 الفطور: 6:30 صباحاً</li>
+<li>📚 دراسة: 7:00 صباحاً</li>
+<li>☕ استراحة: 10:00 صباحاً</li>
+<li>📖 دراسة: 10:30 صباحاً</li>
+<li>🍽 الغداء: 1:00 ظهراً</li>
+<li>😴 راحة: 2:00 ظهراً</li>
+<li>📚 دراسة: 4:00 عصراً</li>
+<li>🍴 العشاء: 8:00 مساءً</li>
+<li>🛏 النوم: 10:30 مساءً</li>
+</ul>
+
+</div>
+`;
+
+});
+
+document.getElementById("result").innerHTML = html;
+
+saveData();
+
+}
+const subjects = [
+"العربي",
+"الإنكليزي",
+"الرياضيات",
+"الفيزياء",
+"الكيمياء",
+"الأحياء",
+"الإسلامية"
+];
+
+const subjectsContainer =
+document.getElementById("subjects");
+
 function loadSubjects(){
+
 subjectsContainer.innerHTML="";
 
 subjects.forEach((name,index)=>{
+
 subjectsContainer.innerHTML += `
 <div class="subject">
+
 <h2>${name}</h2>
 
 <label>
@@ -129,23 +224,42 @@ subjectsContainer.innerHTML += `
 مسجل في معهد
 </label>
 
-<input id="institute${index}" placeholder="اسم المعهد">
+<input
+id="institute${index}"
+placeholder="اسم المعهد">
 
 <div id="events${index}"></div>
 
-<button class="addLecture" onclick="addLecture(${index})">➕ محاضرة</button>
-<button class="addOnline" onclick="addOnlineExam(${index})">💻 إلكتروني</button>
-<button class="addExam" onclick="addPhysicalExam(${index})">📝 حضوري</button>
+<button
+class="addLecture"
+onclick="addLecture(${index})">
+➕ محاضرة
+</button>
+
+<button
+class="addOnline"
+onclick="addOnlineExam(${index})">
+💻 إلكتروني
+</button>
+
+<button
+class="addExam"
+onclick="addPhysicalExam(${index})">
+📝 حضوري
+</button>
 
 </div>
 `;
+
 });
+
 }
 
-/* عنصر الحدث */
 function createEventHTML(type){
+
 return `
 <div class="event">
+
 <b>${type}</b>
 
 <select class="day">
@@ -161,66 +275,146 @@ return `
 <input type="time" class="startTime">
 <input type="time" class="endTime">
 
-<button class="deleteBtn" onclick="this.parentElement.remove()">حذف</button>
+<button
+class="deleteBtn"
+onclick="this.parentElement.remove();saveData();">
+حذف
+</button>
+
 </div>
 `;
-}
 
-/* إضافة أحداث */
-function addLecture(i){
-document.getElementById(`events${i}`)
-.insertAdjacentHTML("beforeend", createEventHTML("🎓 محاضرة"));
+}function addLecture(i){
+
+document
+.getElementById(`events${i}`)
+.insertAdjacentHTML(
+"beforeend",
+createEventHTML("🎓 محاضرة")
+);
+
+saveData();
+
 }
 
 function addOnlineExam(i){
-document.getElementById(`events${i}`)
-.insertAdjacentHTML("beforeend", createEventHTML("💻 إلكتروني"));
+
+document
+.getElementById(`events${i}`)
+.insertAdjacentHTML(
+"beforeend",
+createEventHTML("💻 إلكتروني")
+);
+
+saveData();
+
 }
 
 function addPhysicalExam(i){
-document.getElementById(`events${i}`)
-.insertAdjacentHTML("beforeend", createEventHTML("📝 حضوري"));
+
+document
+.getElementById(`events${i}`)
+.insertAdjacentHTML(
+"beforeend",
+createEventHTML("📝 حضوري")
+);
+
+saveData();
+
 }
 
 /* حفظ البيانات */
 function saveData(){
-localStorage.setItem("studyApp", document.body.innerHTML);
-alert("تم الحفظ ✔");
+
+const data = {
+
+subjectsHTML:
+document.getElementById("subjects").innerHTML,
+
+scheduleHTML:
+document.getElementById("result").innerHTML
+
+};
+
+localStorage.setItem(
+"studyApp",
+JSON.stringify(data)
+);
+
 }
 
 /* تحميل البيانات */
 function loadData(){
-const data = localStorage.getItem("studyApp");
-if(data){
-document.body.innerHTML = data;
-}
+
+const saved =
+localStorage.getItem("studyApp");
+
+if(!saved) return;
+
+const data =
+JSON.parse(saved);
+
+document.getElementById("subjects").innerHTML =
+data.subjectsHTML || "";
+
+document.getElementById("result").innerHTML =
+data.scheduleHTML || "";
+
 }
 
 /* حذف الكل */
 function clearAll(){
+
 if(confirm("هل تريد حذف كل البيانات؟")){
+
 localStorage.removeItem("studyApp");
+
 location.reload();
+
 }
+
 }
 
 /* إنشاء الجدول */
 function generateSchedule(){
 
-const days=["السبت","الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"];
+const days = [
+"السبت",
+"الأحد",
+"الإثنين",
+"الثلاثاء",
+"الأربعاء",
+"الخميس",
+"الجمعة"
+];
 
-let week={};
-days.forEach(d=>week[d]=[]);
+let week = {};
+
+days.forEach(day=>{
+week[day]=[];
+});
 
 subjects.forEach((subject,index)=>{
 
-document.querySelectorAll(`#events${index} .event`).forEach(ev=>{
+document
+.querySelectorAll(`#events${index} .event`)
+.forEach(ev=>{
 
-week[ev.querySelector(".day").value].push({
+week[
+ev.querySelector(".day").value
+].push({
+
 subject,
-type: ev.querySelector("b").innerText,
-start: ev.querySelector(".startTime").value,
-end: ev.querySelector(".endTime").value
+
+type:
+ev.querySelector("b").innerText,
+
+start:
+ev.querySelector(".startTime").value,
+
+end:
+ev.querySelector(".endTime").value
+
 });
 
 });
@@ -230,61 +424,94 @@ end: ev.querySelector(".endTime").value
 let html="";
 
 days.forEach(day=>{
-html+=`
+
+html += `
 <div class="dayCard">
-<h2 class="dayTitle">${day}</h2>
+
+<h2 class="dayTitle">
+${day}
+</h2>
+
 <ul>
 `;
 
-week[day].sort((a,b)=>a.start.localeCompare(b.start));
+week[day].sort(
+(a,b)=>
+a.start.localeCompare(b.start)
+);
 
 if(week[day].length===0){
-html+=`<li>📖 مراجعة عامة</li>`;
+
+html += `
+<li>
+📖 مراجعة عامة
+</li>
+`;
+
 }
 
 week[day].forEach(item=>{
 
-let cls="";
-
 if(item.type.includes("محاضرة")){
-cls="lecture";
-html+=`
-<li class="${cls}">
-${item.start} - ${item.end} ${item.type} ${item.subject}
+
+html += `
+<li class="lecture">
+${item.start} - ${item.end}
+${item.type}
+${item.subject}
 </li>
-<li class="study">📚 مراجعة ${item.subject} قبل المحاضرة</li>
 `;
+
 }
 
 if(item.type.includes("إلكتروني")){
-cls="online";
-html+=`
-<li class="${cls}">
-${item.start} - ${item.end} ${item.type} ${item.subject}
+
+html += `
+<li class="online">
+${item.start} - ${item.end}
+${item.type}
+${item.subject}
 </li>
-<li class="study">📖 مراجعة ${item.subject} قبل الامتحان</li>
 `;
+
 }
 
 if(item.type.includes("حضوري")){
-cls="exam";
-html+=`
-<li class="${cls}">
-${item.start} - ${item.end} ${item.type} ${item.subject}
+
+html += `
+<li class="exam">
+${item.start} - ${item.end}
+${item.type}
+${item.subject}
 </li>
-<li class="study">🔥 مراجعة مكثفة ${item.subject}</li>
 `;
+
 }
 
 });
 
-html+=`</ul></div>`;
+html += `
+</ul>
+</div>
+`;
+
 });
 
-document.getElementById("result").innerHTML=html;
+document.getElementById("result").innerHTML =
+html;
+
+/* حفظ الجدول تلقائياً */
+saveData();
+
 }
 
-/* تشغيل أولي */
+/* حفظ تلقائي عند أي تعديل */
+document.addEventListener(
+"change",
+saveData
+);
+
+/* تشغيل */
 loadSubjects();
 loadData();
 
