@@ -484,13 +484,10 @@ html += `
 ${formatTime12h(item.start)} - ${formatTime12h(item.end)}
 ${item.type}
 ${item.subject}
-${item.type}
-${item.subject}
 </li>
 `;
 
 }
-
 if(item.type.includes("حضوري")){
 
 html += `
@@ -498,13 +495,10 @@ html += `
 ${formatTime12h(item.start)} - ${formatTime12h(item.end)}
 ${item.type}
 ${item.subject}
-${item.type}
-${item.subject}
 </li>
 `;
 
 }
-
 });
 
 html += `
