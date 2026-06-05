@@ -212,7 +212,9 @@ border:1px solid #555;
 </details>
 
 <div id="result"></div>
-
+<button class="generate" onclick="openNotes()">
+📝 ملاحظات المواد
+</button>
 <div id="bottomButtons">
 <button class="generate" onclick="generateSchedule()">
 إنشاء الجدول الذكي
@@ -691,8 +693,92 @@ document.body.classList.add("darkMode");
 }
 loadSubjects();
 loadData();
+let currentNoteIndex = null;
 
+function openNotes(){
+
+document.getElementById("notesModal").style.display = "block";
+
+let html = "";
+
+subjects.forEach((s,i)=>{
+
+html += `
+<button onclick="selectSubjectNote(${i})"
+style="width:100%;margin:5px;padding:10px;">
+${s}
+</button>
+`;
+
+});
+
+document.getElementById("notesSubjects").innerHTML = html;
+
+}
+
+function selectSubjectNote(i){
+
+currentNoteIndex = i;
+
+const data = JSON.parse(localStorage.getItem("studyApp")) || {};
+
+document.getElementById("noteText").value =
+(data.notes && data.notes[i]) ? data.notes[i] : "";
+
+}
+
+function saveNote(){
+
+const text = document.getElementById("noteText").value;
+
+let data = JSON.parse(localStorage.getItem("studyApp")) || {};
+
+if(!data.notes) data.notes = {};
+
+data.notes[currentNoteIndex] = text;
+
+localStorage.setItem("studyApp", JSON.stringify(data));
+
+alert("تم الحفظ ✔️");
+}
+
+function closeNotes(){
+document.getElementById("notesModal").style.display = "none";
+}
 </script>
+<div id="notesModal" style="
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,.6);
+z-index:2000;
+">
 
+<div style="
+background:white;
+width:90%;
+max-width:500px;
+margin:50px auto;
+padding:15px;
+border-radius:15px;
+">
+
+<h2>📝 ملاحظات المواد</h2>
+
+<div id="notesSubjects"></div>
+
+<textarea id="noteText" style="width:100%;height:150px;margin-top:10px;"></textarea>
+
+<button onclick="saveNote()" style="background:#2e7d32;color:white;width:100%;padding:10px;margin-top:10px;">
+💾 حفظ
+</button>
+
+<button onclick="closeNotes()" style="background:#c62828;color:white;width:100%;padding:10px;margin-top:10px;">
+❌ إغلاق
+</button>
+
+</div>
+</div>
 </body>
 </html>
