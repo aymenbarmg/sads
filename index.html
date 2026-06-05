@@ -3,13 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مساعد طالب السادس العلمي</title>
+<title> امساعد طالب السادس العلمي</title>
 
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 
 <style>
+    
+    #settingsBtn{
+position:fixed;
+top:15px;
+left:15px;
+width:50px;
+height:50px;
+border:none;
+border-radius:50%;
+background:#1565c0;
+color:white;
+font-size:24px;
+cursor:pointer;
+box-shadow:0 2px 10px rgba(0,0,0,.3);
+z-index:1000;
+}
+    .subjectsBox{
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.subjectsBox summary{
+font-size:22px;
+font-weight:bold;
+color:#1565c0;
+cursor:pointer;
+list-style:none;
+}
+
+.subjectsBox summary::-webkit-details-marker{
+display:none;
+}
+
+.subjectsBox summary::before{
+content:"📚 ";
+}
 *{
 margin:0;
 padding:0;
@@ -132,25 +171,83 @@ color:white;
 padding:5px 10px;
 font-size:12px;
 }
+.darkMode{
+background:#121212 !important;
+color:white;
+}
+
+.darkMode .subject,
+.darkMode .dayCard,
+.darkMode .subjectsBox,
+.darkMode .event{
+background:#1e1e1e;
+color:white;
+}
+
+.darkMode h1,
+.darkMode h2,
+.darkMode .dayTitle{
+color:#64b5f6;
+}
+
+.darkMode input,
+.darkMode select{
+background:#2c2c2c;
+color:white;
+border:1px solid #555;
+}
 </style>
 </head>
 
 <body>
+<button id="settingsBtn" onclick="openSettings()">
+⚙️
 
-<h1>📚 مساعد طالب السادس العلمي</h1>
-
-<div id="subjects"></div>
-
-<button class="saveBtn" onclick="saveData()">💾 حفظ البيانات</button>
-<button class="generate" onclick="generateSchedule()">إنشاء الجدول الذكي</button>
-<button class="generate" onclick="generateRoutine()">
-📅 إنشاء روتين يومي
 </button>
-<button class="clearBtn" onclick="clearAll()">🗑 حذف كل شيء</button>
+<h1>📚 مساعد طالب السادس العلمي</h1>
+<h1>𝓐𝔂𝓶𝓪𝓷</h1>
+<details class="subjectsBox">
+<summary>📚 المواد</summary>
+<div id="subjects"></div>
+</details>
 
 <div id="result"></div>
 
+<div id="bottomButtons">
+<button class="generate" onclick="generateSchedule()">
+إنشاء الجدول الذكي
+</button>
+
+<button class="generate" onclick="generateRoutine()">
+📅 إنشاء روتين يومي
+</button>
+
+<button class="clearBtn" onclick="clearAll()">
+🗑 حذف كل شيء
+</button>
+</div>
+
 <script>
+    function openSettings(){
+
+const darkMode =
+confirm(
+"🌙 تفعيل الوضع الليلي؟\n\nاضغط موافق للتفعيل أو إلغاء للإبقاء على الوضع الحالي.\n\n📞 07701046271\n💬 Telegram: Aot_121"
+);
+
+if(darkMode){
+
+document.body.classList.toggle("darkMode");
+
+localStorage.setItem(
+"darkMode",
+document.body.classList.contains("darkMode")
+);
+
+}
+
+}
+    
     function formatTime12h(time24){
 let [h, m] = time24.split(":");
 h = parseInt(h);
@@ -335,18 +432,44 @@ createEventHTML("📝 حضوري")
 saveData();
 
 }
-
 /* حفظ البيانات */
 function saveData(){
 
+let allData = [];
+
+subjects.forEach((subject,index)=>{
+
+let events = [];
+
+document
+.querySelectorAll(`#events${index} .event`)
+.forEach(ev=>{
+
+events.push({
+type: ev.querySelector("b").innerText,
+day: ev.querySelector(".day").value,
+start: ev.querySelector(".startTime").value,
+end: ev.querySelector(".endTime").value
+});
+
+});
+
+allData.push({
+registered:
+document.getElementById(`registered${index}`)?.checked || false,
+
+institute:
+document.getElementById(`institute${index}`)?.value || "",
+
+events
+});
+
+});
+
 const data = {
-
-subjectsHTML:
-document.getElementById("subjects").innerHTML,
-
+subjectsData: allData,
 scheduleHTML:
 document.getElementById("result").innerHTML
-
 };
 
 localStorage.setItem(
@@ -367,8 +490,48 @@ if(!saved) return;
 const data =
 JSON.parse(saved);
 
-document.getElementById("subjects").innerHTML =
-data.subjectsHTML || "";
+if(data.subjectsData){
+
+data.subjectsData.forEach((sub,index)=>{
+
+const reg =
+document.getElementById(`registered${index}`);
+
+const inst =
+document.getElementById(`institute${index}`);
+
+if(reg) reg.checked = sub.registered;
+if(inst) inst.value = sub.institute;
+
+const container =
+document.getElementById(`events${index}`);
+
+container.innerHTML = "";
+
+sub.events.forEach(ev=>{
+
+container.insertAdjacentHTML(
+"beforeend",
+createEventHTML(ev.type)
+);
+
+const last =
+container.lastElementChild;
+
+last.querySelector(".day").value =
+ev.day;
+
+last.querySelector(".startTime").value =
+ev.start;
+
+last.querySelector(".endTime").value =
+ev.end;
+
+});
+
+});
+
+}
 
 document.getElementById("result").innerHTML =
 data.scheduleHTML || "";
@@ -523,6 +686,9 @@ saveData
 );
 
 /* تشغيل */
+if(localStorage.getItem("darkMode")==="true"){
+document.body.classList.add("darkMode");
+}
 loadSubjects();
 loadData();
 
